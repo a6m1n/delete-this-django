@@ -1,0 +1,110 @@
+{% extends 'app_users/base.html' %}
+{% block title %} List users  {% endblock %}
+{% block content %}
+    <div class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li>
+                            <a href="{% url "list_page" %}">Home</a>
+                        </li>
+                        <li class="active">Tour Leads</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <a class="btn btn-primary" href="{% url 'create_page' %}"><i class="fa fa-plus fa-fw"></i>Add Lead</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table">
+                        <thead>
+                            <tr class="active">
+                                <th>Choose</th>
+                                <th>Operation</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Card Number</th>
+                                <th>Expire Date</th>
+                                <th>Languages</th>
+                                <th>Professional</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <form class="form-group row" method="POST" action="{% url 'delete_page'  %}" id="forms">
+                            {% csrf_token %}
+                            {% for user in users %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="{{user.pk}}" id="user-{{user.pk}}" class="check">
+                                </td>
+                                <td>
+                                        <a href="{% url "update_page" pk=user.pk %}">Edit</a>|
+                                        <a href="#" class="delete_one" name="user-{{user.pk}}" >Delete</a>
+                                </td>
+                                <td>
+                                    <a href="/{{user.pk}}">{{user.name}}</a>
+                                </td>
+                                <td>{{user.gender}}</td>
+                                <td>{{user.card_number}}</td>
+                                <td>{{user.expire_date.isoformat}}</td>
+                                <td>{% for lang in user.languages.all %}{{lang.name}} {% endfor %}</td>
+                                <td>{{user.professional}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row ">
+                <div class="col-md-3 ">
+                        <input type="checkbox" id="select-all">Select All
+                        <button class="btn btn-primary pull-right " type="submit"><i class="fa fa-remove
+                        fa-fw "></i>Delete</button>
+                </div>
+                </form>
+
+                {% include "app_users/_paginate.html" %}
+            </div>
+        </div>
+    </div>
+
+<script language="JavaScript">
+    var favorite = [];
+
+    $('#select-all').click(function(event) {
+        if(this.checked) {
+            $(':checkbox').each(function() {
+                this.checked = true;
+                favorite.push($(this).attr("name"));
+            });
+        } else {
+            $(':checkbox').each(function() {
+                favorite.splice($(this).attr("name"));
+                this.checked = false;
+            });
+
+        }
+    });
+    
+    $('.check').click(function(event) {
+        if(this.checked) {
+            favorite.push($(this).attr("name"));
+        } else {
+            const index = favorite.indexOf($(this).attr("name"));
+            favorite.splice(index, 1);
+        }
+    });
+
+    $('.delete_one').click(function(event) {
+        document.getElementById($(this).attr("name")).checked = true;
+        document.getElementById('forms').submit();
+});
+
+
+
+</script>
+{% endblock %}
